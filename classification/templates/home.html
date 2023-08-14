@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Plant Disease Classification</title>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Plant Disease Classification</h1>
+        <p>With a <b>Treatment</b> Recommendation.</p>
+    </div>
+
+    <!-- Content -->
+
+    <div class="row">
+        <div class="side">
+            <h2>Upload Image</h2>
+            <p>Upload Your Image Here</p>
+            <br>
+            <form method="post" action="{% url 'classify' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="model">Pilih Jenis Tanaman</label>
+                <br>
+                <select name="model" id="model">
+                    <option value="model_combine">Kombinasi</option>
+                    <!-- <option value="model_cassava">Singkong</option> -->
+                    <!-- <option value="model_tomato">Tomat</option> -->
+                    <option value="model_potato">Kentang</option>
+                    <option value="model_rice">Padi</option>
+                    <option value="model_grape">Anggur</option>
+                </select>
+                <br>
+                <br>
+                <input type="file" name="image" accept="image/*">
+                <br>
+                <br>
+                <input type="submit" name="upload_button" value="Classify">
+                <!-- <button type="submit" value="Classify">Take Photo</button> -->
+            </form>
+
+            {% if captured_image %}
+                <img src="{{ captured_image.url }}" alt="Captured Image" width="256" height="256">
+            {% endif %}
+        </div>
+
+        <div class="main">
+            <h2>Classification Results</h2>
+            {% if predicted_class %}
+                <form method="POST" action="{% url 'clear_results' %}">
+                    {% csrf_token %}
+                    <input type="submit" value="Clear Results">
+                </form>
+                <p>Predicted Class: {{ predicted_class }}</p>
+                <p>Class Index: {{ predicted_class_index }}</p>
+                <p>Probability: {{ probability }}%</p>
+                {% if uploaded_image %}
+                    <img src="{{ uploaded_image.url }}" alt="Uploaded Image" width="256" height="256">
+                {% endif %}
+                <br>
+                <br>
+                {% if treatment %}
+                    <p>Rekomendasi : <br><br> {{ treatment|linebreaks }}</p>
+                    <br>
+                    <p>Sumber : <br> {{ trsource }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+
+        // Function to process the classification result
+        function processClassificationResult(result) {
+            var predictedClassIndexElement = document.getElementById('predicted_class_index')
+            var predictedClassElement = document.getElementById('predicted_class');
+            var probabilityElement = document.getElementById('probability');
+            var treatmentElement = document.getElementById('treatment');
+            var trsouceElement = document.getElementById('trsource')
+
+            predictedClassIndexElement.textContent = 'Predicted Class Index: ' + result.predicted_class_index;
+            predictedClassElement.textContent = 'Predicted Class: ' + result.predicted_class;
+            probabilityElement.textContent = 'Probability: ' + result.probability + '%';
+            treatmentElement.textContent = 'Treatment: ' + result.treatment;
+            trsouceElement.textContent = 'Source: ' + result.trsouceElement;
+
+            // Show the classification result section
+            var classificationResultSection = document.getElementById('classificationResult');
+            classificationResultSection.style.display = 'block';
+        }
+
+        captureButton.addEventListener("click", function() {
+            // Capture the image (add your own implementation)
+            captureImage();
+        });
+
+        // Function to capture and classify the image
+        function captureImage() {
+           // Add your code to capture the image from the camera
+            // and submit the form to trigger the classification process
+            document.querySelector("form").submit();
+        }
+
+        // Function to retrieve a cookie value by name
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+    </script>
+
+</body>
+</html>

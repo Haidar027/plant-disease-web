@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plant Disease Classification Result</title>
+</head>
+<body>
+    <h1>Classification Result</h1>
+    {% if predicted_class %}
+        <h2>Predicted Class: {{ predicted_class }}</h2>
+        <p>Probability: {{ probability }}</p>
+    {% else %}
+        <h2>No result found</h2>
+    {% endif %}
+</body>
+</html>
